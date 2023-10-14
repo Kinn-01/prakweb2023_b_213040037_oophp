@@ -1,24 +1,22 @@
 <?php
 
-// Interface
-/*
-- Kelas Abstrak yang sama sekali tidak memiliki implementasi.
-- Murni merupakan template untuk kelas turunannya.
-- Tidak boleh memiliki properti, hanya deklarasi method saja.
-- Semua method harus dideklarasikan dengan visibility public.
-- Boleh mendeklarasikan __construct().
-- Satu kelas boleh mengimplementasikan banyak interface.
-- Dengan menggunakan type-hinting dapat melakukan "Dependency Injection".
-- Pada akhirnya akan mencapai Polymorphism.
+// Visibility
+/* 
+- Konsep yang digunakan untuk mengatur akses dari property dan method pada sebuah objek
+- Ada 3 keyword visibility : public, protected, dan private
+- public, dapat digunakan dimana saja, bahkan diluar kelas
+- protected, hanya dapat digunakan di dalam sebuah kelas beserta turunannya
+- private, hanya dapat digunakan di dalam sebuah kelas tertentu saja
+
+Kenapa?
+- Hanya memperlihatkan aspek dari class yang dibutuhkan oleh 'client'
+- Menentukan kebutuhan yang jelas untuk object
+- Memberikan kendali pada kode untuk menghindari 'bug'
 */
 
-interface InfoProduk {
-    public function getInfoProduk(); 
-}
-
-abstract class Produk {
+class Produk {
     // Property
-    protected $judul, $penulis, $penerbit, $harga, $diskon = 0;
+    private $judul, $penulis, $penerbit, $harga, $diskon = 0;
 
     // Constructor
     public function __construct($judul = "judul", $penulis = "penulis", $penerbit = "penerbit", $harga = 0) {
@@ -72,11 +70,15 @@ abstract class Produk {
     public function getDiskon() {
         return $this->diskon;
     }
-    
-    abstract public function getInfo();
+
+    public function getInfoProduk() {
+        // Komik : Naruto | Masashi Kishimoto, Shonen Jump (Rp. 30000) - 100 Halaman.
+        $str = "{$this->judul} | {$this->getLabel()} (Rp. {$this->harga})";
+        return $str;
+    }
 }
 
-class Komik extends Produk implements InfoProduk {
+class Komik extends Produk {
     public $jmlHalaman;
 
     public function __construct($judul = "judul", $penulis = "penulis", $penerbit = "penerbit", $harga = 0, $jmlHalaman = 0) {
@@ -84,18 +86,13 @@ class Komik extends Produk implements InfoProduk {
         $this->jmlHalaman = $jmlHalaman;
     }
 
-    public function getInfo() {
-        $str = "{$this->judul} | {$this->getLabel()} (Rp. {$this->harga})";
-        return $str;
-    }
-
     public function getInfoProduk() {
-        $str = "Komik : " . $this->getInfo() . " - {$this->jmlHalaman} Halaman.";
+        $str = "Komik : " . parent::getInfoProduk() . " - {$this->jmlHalaman} Halaman.";
         return $str;
     }
 }
 
-class Game extends Produk implements InfoProduk {
+class Game extends Produk {
     public $waktuMain;
 
     public function __construct($judul = "judul", $penulis = "penulis", $penerbit = "penerbit", $harga = 0, $waktuMain = 0) {
@@ -103,42 +100,33 @@ class Game extends Produk implements InfoProduk {
         $this->waktuMain = $waktuMain;
     }
 
-    public function getInfo() {
-        $str = "{$this->judul} | {$this->getLabel()} (Rp. {$this->harga})";
-        return $str;
-    }
-
     public function getInfoProduk() {
-        $str = "Game : " . $this->getInfo() . " ~ {$this->waktuMain} Jam.";
+        $str = "Game : " . parent::getInfoProduk() . " ~ {$this->waktuMain} Jam.";
         return $str;
     }
 }
 
 class CetakInfoProduk {
-    public $daftarProduk = array();
-
-    public function tambahProduk(Produk $produk) {
-        $this->daftarProduk[] = $produk;
-    }
-
-    public function cetak() {
-        $str = "DAFTAR PRODUK : <br>";
-
-        foreach ($this->daftarProduk as $p) {
-            $str .= "- {$p->getInfoProduk()} <br>";
-        }
-
+    public function cetak(Produk $produk) {
+        $str = "{$produk->judul} | {$produk->getLabel()} (Rp. {$produk->harga})";
         return $str;
     }
 }
 
-// Instansiasi
+
 $produk1 = new Komik("Naruto", "Masashi Kishimoto", "Shonen Jump", 30000, 100);
 $produk2 = new Game("Uncharted", "Neil Druckmann", "Sony Computer", 250000, 50);
 
-$cetakProduk = new CetakInfoProduk();
-$cetakProduk->tambahProduk($produk1);
-$cetakProduk->tambahProduk($produk2);
-echo $cetakProduk->cetak();
+echo $produk1->getInfoProduk();
+echo "<br>";
+echo $produk2->getInfoProduk();
+echo "<hr>";
+
+$produk2->setDiskon(50);
+echo $produk2->getHarga();
+echo "<hr>";
+
+$produk1->setPenulis("Lutfi");
+echo $produk1->getPenulis();
 
 ?>

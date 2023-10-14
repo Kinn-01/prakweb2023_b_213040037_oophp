@@ -1,24 +1,25 @@
 <?php
 
-// Interface
+// Abstract Class
 /*
-- Kelas Abstrak yang sama sekali tidak memiliki implementasi.
-- Murni merupakan template untuk kelas turunannya.
-- Tidak boleh memiliki properti, hanya deklarasi method saja.
-- Semua method harus dideklarasikan dengan visibility public.
-- Boleh mendeklarasikan __construct().
-- Satu kelas boleh mengimplementasikan banyak interface.
-- Dengan menggunakan type-hinting dapat melakukan "Dependency Injection".
-- Pada akhirnya akan mencapai Polymorphism.
-*/
+- Sebuah kelas yang tidak dapat di-instansiasi.
+- Kelas 'abstrak'.
+- Mendefinisikan interface untuk kelas lain yang menjadi turunannya.
+- Berperan sebagai 'kerangka dasar' untuk kelas turunannya.
+- Memiliki minimal 1 method abstrak.
+- Digunakan dalam 'pewarisan'/inheritance untuk 'memaksakan' implementasi method abstrak yang sama untuk semua kelas turunannya.
 
-interface InfoProduk {
-    public function getInfoProduk(); 
-}
+Kenapa?
+- Merepresentasikan ide atau konsep dasar.
+- "Composition over inheritance".
+- Salah satu cara menerapkan Polimorphism.
+- Sentralisasi logic.
+- Mempermudah pengerjaan tim.
+*/
 
 abstract class Produk {
     // Property
-    protected $judul, $penulis, $penerbit, $harga, $diskon = 0;
+    private $judul, $penulis, $penerbit, $harga, $diskon = 0;
 
     // Constructor
     public function __construct($judul = "judul", $penulis = "penulis", $penerbit = "penerbit", $harga = 0) {
@@ -72,21 +73,22 @@ abstract class Produk {
     public function getDiskon() {
         return $this->diskon;
     }
+
+    abstract public function getInfoProduk();
     
-    abstract public function getInfo();
+    public function getInfo() {
+        // Komik : Naruto | Masashi Kishimoto, Shonen Jump (Rp. 30000) - 100 Halaman.
+        $str = "{$this->judul} | {$this->getLabel()} (Rp. {$this->harga})";
+        return $str;
+    }
 }
 
-class Komik extends Produk implements InfoProduk {
+class Komik extends Produk {
     public $jmlHalaman;
 
     public function __construct($judul = "judul", $penulis = "penulis", $penerbit = "penerbit", $harga = 0, $jmlHalaman = 0) {
         parent::__construct($judul, $penulis, $penerbit, $harga); // Overriding
         $this->jmlHalaman = $jmlHalaman;
-    }
-
-    public function getInfo() {
-        $str = "{$this->judul} | {$this->getLabel()} (Rp. {$this->harga})";
-        return $str;
     }
 
     public function getInfoProduk() {
@@ -95,17 +97,12 @@ class Komik extends Produk implements InfoProduk {
     }
 }
 
-class Game extends Produk implements InfoProduk {
+class Game extends Produk {
     public $waktuMain;
 
     public function __construct($judul = "judul", $penulis = "penulis", $penerbit = "penerbit", $harga = 0, $waktuMain = 0) {
         parent::__construct($judul, $penulis, $penerbit, $harga); // Overriding
         $this->waktuMain = $waktuMain;
-    }
-
-    public function getInfo() {
-        $str = "{$this->judul} | {$this->getLabel()} (Rp. {$this->harga})";
-        return $str;
     }
 
     public function getInfoProduk() {
@@ -136,9 +133,11 @@ class CetakInfoProduk {
 $produk1 = new Komik("Naruto", "Masashi Kishimoto", "Shonen Jump", 30000, 100);
 $produk2 = new Game("Uncharted", "Neil Druckmann", "Sony Computer", 250000, 50);
 
+
 $cetakProduk = new CetakInfoProduk();
 $cetakProduk->tambahProduk($produk1);
 $cetakProduk->tambahProduk($produk2);
 echo $cetakProduk->cetak();
+
 
 ?>
